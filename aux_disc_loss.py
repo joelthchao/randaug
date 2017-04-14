@@ -57,7 +57,7 @@ def main():
     model.compile(optimizer=Adam(lr), loss='categorical_crossentropy', metrics=['accuracy'])
 
     callbacks = [TensorBoard(log_path)]
-    model.fit(x_train, y_train, batch_size=batch_size, verbose=0, epochs=epochs,
+    model.fit(x_train, y_train, batch_size=batch_size, verbose=1, epochs=epochs,
               validation_data=(x_test, y_test), callbacks=callbacks)
 
 
