@@ -17,8 +17,6 @@ def build_simple_model(input_shape, num_classes):
     net = Conv2D(10, (1, 1), padding='same', activation='relu') (net)
 
     net = GlobalAveragePooling2D() (net)
-
-    flatten = Flatten() (net)
-    out = Dense(num_classes, activation='softmax') (flatten)
+    out = Dense(num_classes, activation='softmax') (net)
 
     return Model(input, out)
