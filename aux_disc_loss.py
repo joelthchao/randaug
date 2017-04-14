@@ -1,10 +1,13 @@
 import argparse
+import numpy as np
 import os
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 import keras
 from keras.datasets import cifar10
+from keras.optimizers import Adam
+from keras.callbacks import TensorBoard
 
 from model import build_simple_model
 
@@ -24,6 +27,12 @@ def get_cifar10_data(num_classes):
     x_train /= 255
     x_test /= 255
 
+    import pdb
+    pdb.set_trace()
+    
+    mean_pixel = np.mean(x_train, axis=0)
+    x_train = x_train - mean_pixel
+    x_test = x_test - mean_pixel
     return x_train, y_train, x_test, y_test
 
 
@@ -34,17 +43,19 @@ def main():
     args = parser.parse_args()
     os.environ['CUDA_VISIBLE_DEVICES'] = str(args.gpu)
 
-    batch_size = 32
+    batch_size = 128
     num_classes = 10
-    epochs = 200
+    epochs = 20
+    lr = 0.001
 
     x_train, y_train, x_test, y_test = get_cifar10_data(num_classes)
 
     model = build_simple_model(x_train.shape[1:], num_classes)
-    model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+    model.compile(optimizer=Adam(lr), loss='categorical_crossentropy', metrics=['accuracy'])
 
-    model.fit(x_train, y_train, batch_size=batch_size,
-              epochs=epochs, validation_data=(x_test, y_test))
+    callbacks = [TensorBoard()]
+    model.fit(x_train, y_train, batch_size=batch_size, verbose=0, epochs=epochs,
+              validation_data=(x_test, y_test), callbacks=callbacks)
 
 
 if __name__ == '__main__':
