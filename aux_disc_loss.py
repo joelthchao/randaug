@@ -9,7 +9,7 @@ from keras.datasets import cifar10
 from model import build_simple_model
 
 
-def get_cifar10_data():
+def get_cifar10_data(num_classes):
     (x_train, y_train), (x_test, y_test) = cifar10.load_data()
     print('x_train shape:', x_train.shape)
     print(x_train.shape[0], 'train samples')
@@ -38,7 +38,7 @@ def main():
     num_classes = 10
     epochs = 200
 
-    x_train, y_train, x_test, y_test = get_cifar10_data()
+    x_train, y_train, x_test, y_test = get_cifar10_data(num_classes)
 
     model = build_simple_model(x_train.shape[1:], num_classes)
     model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
