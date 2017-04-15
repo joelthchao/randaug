@@ -37,10 +37,8 @@ def get_cifar10_data(num_classes, sub_pixel_mean=True):
 
 
 def run(batch_size, optimizer, lr, log_dir):
-    batch_size = 128
     num_classes = 10
     epochs = 20
-    lr = 0.001
 
     log_name = 'bs_{}_op_{}_lr_{}'.format(batch_size, optimizer.__name__, lr)
     log_path = os.path.join(log_dir, log_name)
