@@ -61,7 +61,7 @@ def main():
     args = parser.parse_args()
     os.environ['CUDA_VISIBLE_DEVICES'] = str(args.gpu)
 
-    params = product([32, 128], [Adam, RMSprop], [0.01, 0.001, 0.0001])
+    params = product([32, 128], [Adam, RMSprop], [0.001, 0.0001])
     for batch_size, optimizer, lr in params:
         run(batch_size, optimizer, lr, args.log_dir)
 
