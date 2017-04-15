@@ -36,11 +36,10 @@ def get_cifar10_data(num_classes, sub_pixel_mean=True):
     return x_train, y_train, x_test, y_test
 
 
-def run(batch_size, optimizer, lr, log_dir):
+def run(log_dir, batch_size=32, optimizer=Adam, lr=0.0001, epochs=20):
     num_classes = 10
-    epochs = 20
 
-    log_name = 'bs_{}_op_{}_lr_{}'.format(batch_size, optimizer.__name__, lr)
+    log_name = 'bs_{}_op_{}_lr_{}_ep_{}'.format(batch_size, optimizer.__name__, lr, epochs)
     log_path = os.path.join(log_dir, log_name)
 
     x_train, y_train, x_test, y_test = get_cifar10_data(num_classes)
@@ -60,10 +59,7 @@ def main():
 
     args = parser.parse_args()
     os.environ['CUDA_VISIBLE_DEVICES'] = str(args.gpu)
-
-    params = product([32, 128], [Adam, RMSprop], [0.001, 0.0001])
-    for batch_size, optimizer, lr in params:
-        run(batch_size, optimizer, lr, args.log_dir)
+    run(args.log_dir, epochs=100)
 
 
 if __name__ == '__main__':
