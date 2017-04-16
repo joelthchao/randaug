@@ -9,6 +9,7 @@ import keras
 from keras.datasets import cifar10
 from keras.optimizers import Adam, RMSprop
 from keras.callbacks import TensorBoard
+from keras.preprocessing.image import ImageDataGenerator
 
 from model import build_simple_model
 from wide_resnet import build_wide_resnet_model
@@ -53,10 +54,11 @@ def run_simple_model(log_dir, batch_size=32, optimizer=Adam, lr=0.0001, epochs=2
               validation_data=(x_test, y_test), callbacks=callbacks)
 
 
-def run(log_dir, batch_size=128, optimizer=Adam, lr=0.001, epochs=20):
+def run(log_dir, batch_size=128, optimizer=Adam, lr=0.001, epochs=20, data_augmentation=False):
     num_classes = 10
 
-    log_name = 'wide_resnet_bs_{}_op_{}_lr_{}_ep_{}'.format(batch_size, optimizer.__name__, lr, epochs)
+    log_name = 'wide_resnet_bs_{}_op_{}_lr_{}_ep_{}_ag_{}'.format(
+            batch_size, optimizer.__name__, lr, epochs, data_augmentation)
     log_path = os.path.join(log_dir, log_name)
 
     x_train, y_train, x_test, y_test = get_cifar10_data(num_classes)
@@ -65,8 +67,22 @@ def run(log_dir, batch_size=128, optimizer=Adam, lr=0.001, epochs=20):
     model.compile(optimizer=optimizer(lr), loss='categorical_crossentropy', metrics=['accuracy'])
 
     callbacks = [TensorBoard(log_path)]
-    model.fit(x_train, y_train, batch_size=batch_size, verbose=1, epochs=epochs,
-              validation_data=(x_test, y_test), callbacks=callbacks)
+
+    if data_augmentation:
+        train_data_gen = ImageDataGenerator(
+                width_shift_range=0.125,
+                height_shift_range=0.125,
+                fill_mode='reflect',
+                horizontal_flip=True
+        )
+        steps_per_epoch = (x_train.shape[0] - 1) // batch_size + 1
+        model.fit_generator(train_data_gen.flow(x_train, y_train),
+                            steps_per_epoch=steps_per_epoch,
+                            batch_size=batch_size, verbose=1, epochs=epochs,
+                            validation_data=(x_test, y_test), callbacks=callbacks)
+    else:
+        model.fit(x_train, y_train, batch_size=batch_size, verbose=1, epochs=epochs,
+                  validation_data=(x_test, y_test), callbacks=callbacks)
 
 
 def main():
@@ -76,7 +92,7 @@ def main():
 
     args = parser.parse_args()
     os.environ['CUDA_VISIBLE_DEVICES'] = str(args.gpu)
-    run(args.log_dir, epochs=20)
+    run(args.log_dir, epochs=20, data_augmentation=True)
 
 
 if __name__ == '__main__':
