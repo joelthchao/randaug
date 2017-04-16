@@ -20,13 +20,13 @@ def wide_basic(incoming, nb_in_filters, nb_out_filters, dropout=None, strides=(2
 
     if nb_in_filters == nb_out_filters:
         # conv3x3
-        y = BatchNormalization(axis=1)(incoming)
+        y = BatchNormalization(axis=3)(incoming)
         y = Activation('relu')(y)
         y = ZeroPadding2D((1, 1))(y)
         y = Conv2D(nb_bottleneck_filter, (3, 3), strides=strides, kernel_initializer='he_normal')(y)
 
         # conv3x3
-        y = BatchNormalization(axis=1)(y)
+        y = BatchNormalization(axis=3)(y)
         y = Activation('relu')(y)
         if dropout is not None:
             y = Dropout(dropout)(y)
@@ -37,7 +37,7 @@ def wide_basic(incoming, nb_in_filters, nb_out_filters, dropout=None, strides=(2
 
     else:  # Residual Units for increasing dimensions
         # common BN, ReLU
-        shortcut = BatchNormalization(axis=1)(incoming)
+        shortcut = BatchNormalization(axis=3)(incoming)
         shortcut = Activation('relu')(shortcut)
 
         # conv3x3
@@ -45,7 +45,7 @@ def wide_basic(incoming, nb_in_filters, nb_out_filters, dropout=None, strides=(2
         y = Conv2D(nb_bottleneck_filter, (3, 3), strides=strides, kernel_initializer='he_normal')(y)
 
         # conv3x3
-        y = BatchNormalization(axis=1)(y)
+        y = BatchNormalization(axis=3)(y)
         y = Activation('relu')(y)
         if dropout is not None:
             y = Dropout(dropout)(y)
@@ -75,7 +75,7 @@ def build_wide_resnet_model(input_shape, num_classes):
     # Stage 3 (spatial size: 8x8)
     x = bottleneck(x, n, 32 * k, 64 * k, dropout=0.3, subsample=(2, 2))
 
-    x = BatchNormalization(axis=1)(x)
+    x = BatchNormalization(axis=3)(x)
     x = Activation('relu')(x)
     x = AveragePooling2D((8, 8), strides=(1, 1))(x)
     x = Flatten()(x)
