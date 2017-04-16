@@ -75,7 +75,7 @@ def build_wide_resnet_model(input_shape, num_classes):
     # Stage 3 (spatial size: 8x8)
     x = bottleneck(x, n, 32 * k, 64 * k, dropout=0.3, subsample=(2, 2))
 
-    x = BatchNormalization(mode=0, axis=1)(x)
+    x = BatchNormalization(axis=1)(x)
     x = Activation('relu')(x)
     x = AveragePooling2D((8, 8), strides=(1, 1))(x)
     x = Flatten()(x)
