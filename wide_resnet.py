@@ -1,9 +1,10 @@
 
-from keras.layers import merge, Input
+from keras.layers import Input
 from keras.layers import Conv2D, ZeroPadding2D, AveragePooling2D
 from keras.layers.core import Dense, Activation, Flatten, Dropout
 from keras.layers.normalization import BatchNormalization
 from keras.models import Model
+from keras.layers.merge import add
 
 
 def bottleneck(incoming, count, nb_in_filters, nb_out_filters, dropout=None, subsample=(2, 2)):
@@ -19,24 +20,24 @@ def wide_basic(incoming, nb_in_filters, nb_out_filters, dropout=None, strides=(2
 
     if nb_in_filters == nb_out_filters:
         # conv3x3
-        y = BatchNormalization(mode=0, axis=1)(incoming)
+        y = BatchNormalization(axis=1)(incoming)
         y = Activation('relu')(y)
         y = ZeroPadding2D((1, 1))(y)
         y = Conv2D(nb_bottleneck_filter, (3, 3), strides=strides, kernel_initializer='he_normal')(y)
 
         # conv3x3
-        y = BatchNormalization(mode=0, axis=1)(y)
+        y = BatchNormalization(axis=1)(y)
         y = Activation('relu')(y)
         if dropout is not None:
             y = Dropout(dropout)(y)
         y = ZeroPadding2D((1, 1))(y)
         y = Conv2D(nb_bottleneck_filter, (3, 3), strides=(1, 1), kernel_initializer='he_normal')(y)
 
-        return merge([incoming, y], mode='sum')
+        return add([incoming, y])
 
     else:  # Residual Units for increasing dimensions
         # common BN, ReLU
-        shortcut = BatchNormalization(mode=0, axis=1)(incoming)
+        shortcut = BatchNormalization(axis=1)(incoming)
         shortcut = Activation('relu')(shortcut)
 
         # conv3x3
@@ -52,9 +53,9 @@ def wide_basic(incoming, nb_in_filters, nb_out_filters, dropout=None, strides=(2
         y = Conv2D(nb_out_filters, (3, 3), strides=(1, 1), kernel_initializer='he_normal')(y)
 
         # shortcut
-        shortcut = Conv2D(nb_out_filters, nb_row=1, nb_col=1, strides=strides, kernel_initializer='he_normal')(shortcut)
+        shortcut = Conv2D(nb_out_filters, (1, 1), strides=strides, kernel_initializer='he_normal')(shortcut)
 
-        return merge([shortcut, y], mode='sum')
+        return add([shortcut, y])
 
 
 def build_wide_resnet_model(input_shape, num_classes):
