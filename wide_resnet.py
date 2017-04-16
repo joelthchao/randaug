@@ -22,7 +22,7 @@ def wide_basic(incoming, nb_in_filters, nb_out_filters, dropout=None, strides=(2
         y = BatchNormalization(mode=0, axis=1)(incoming)
         y = Activation('relu')(y)
         y = ZeroPadding2D((1, 1))(y)
-        y = Conv2D(nb_bottleneck_filter, (3, 3), strides=strides, init='he_normal')(y)
+        y = Conv2D(nb_bottleneck_filter, (3, 3), strides=strides, kernel_initializer='he_normal')(y)
 
         # conv3x3
         y = BatchNormalization(mode=0, axis=1)(y)
@@ -30,7 +30,7 @@ def wide_basic(incoming, nb_in_filters, nb_out_filters, dropout=None, strides=(2
         if dropout is not None:
             y = Dropout(dropout)(y)
         y = ZeroPadding2D((1, 1))(y)
-        y = Conv2D(nb_bottleneck_filter, (3, 3), strides=(1, 1), init='he_normal')(y)
+        y = Conv2D(nb_bottleneck_filter, (3, 3), strides=(1, 1), kernel_initializer='he_normal')(y)
 
         return merge([incoming, y], mode='sum')
 
@@ -41,18 +41,18 @@ def wide_basic(incoming, nb_in_filters, nb_out_filters, dropout=None, strides=(2
 
         # conv3x3
         y = ZeroPadding2D((1, 1))(shortcut)
-        y = Conv2D(nb_bottleneck_filter, (3, 3), strides=strides, init='he_normal')(y)
+        y = Conv2D(nb_bottleneck_filter, (3, 3), strides=strides, kernel_initializer='he_normal')(y)
 
         # conv3x3
-        y = BatchNormalization(mode=0, axis=1)(y)
+        y = BatchNormalization(axis=1)(y)
         y = Activation('relu')(y)
         if dropout is not None:
             y = Dropout(dropout)(y)
         y = ZeroPadding2D((1, 1))(y)
-        y = Conv2D(nb_out_filters, (3, 3), strides=(1, 1), init='he_normal')(y)
+        y = Conv2D(nb_out_filters, (3, 3), strides=(1, 1), kernel_initializer='he_normal')(y)
 
         # shortcut
-        shortcut = Conv2D(nb_out_filters, nb_row=1, nb_col=1, strides=strides, init='he_normal')(shortcut)
+        shortcut = Conv2D(nb_out_filters, nb_row=1, nb_col=1, strides=strides, kernel_initializer='he_normal')(shortcut)
 
         return merge([shortcut, y], mode='sum')
 
@@ -80,5 +80,5 @@ def build_wide_resnet_model(input_shape, num_classes):
     x = Flatten()(x)
     preds = Dense(num_classes, activation='softmax')(x)
 
-    model = Model(input=img_input, output=preds)
+    model = Model(inputs=img_input, outputs=preds)
     return model

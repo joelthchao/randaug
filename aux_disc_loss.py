@@ -53,7 +53,7 @@ def run_simple_model(log_dir, batch_size=32, optimizer=Adam, lr=0.0001, epochs=2
               validation_data=(x_test, y_test), callbacks=callbacks)
 
 
-def run(log_dir, batch_size=32, optimizer=Adam, lr=0.0001, epochs=20):
+def run(log_dir, batch_size=128, optimizer=Adam, lr=0.001, epochs=20):
     num_classes = 10
 
     log_name = 'wide_resnet_bs_{}_op_{}_lr_{}_ep_{}'.format(batch_size, optimizer.__name__, lr, epochs)
