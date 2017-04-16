@@ -20,3 +20,4 @@ def build_simple_model(input_shape, num_classes):
     out = Dense(num_classes, activation='softmax') (net)
 
     return Model(input, out)
+
