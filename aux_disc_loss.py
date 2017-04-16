@@ -69,17 +69,16 @@ def run(log_dir, batch_size=128, optimizer=Adam, lr=0.001, epochs=20, data_augme
     callbacks = [TensorBoard(log_path)]
 
     if data_augmentation:
-        train_data_gen = ImageDataGenerator(
+        img_gen = ImageDataGenerator(
                 width_shift_range=0.125,
                 height_shift_range=0.125,
                 fill_mode='reflect',
                 horizontal_flip=True
         )
+        train_data_gen = img_gen.flow(x_train, y_train, batch_size=batch_size)
         steps_per_epoch = (x_train.shape[0] - 1) // batch_size + 1
-        model.fit_generator(train_data_gen.flow(x_train, y_train),
-                            steps_per_epoch=steps_per_epoch,
-                            batch_size=batch_size, verbose=1, epochs=epochs,
-                            validation_data=(x_test, y_test), callbacks=callbacks)
+        model.fit_generator(train_data_gen, steps_per_epoch=steps_per_epoch,
+                            verbose=1, epochs=epochs, validation_data=(x_test, y_test), callbacks=callbacks)
     else:
         model.fit(x_train, y_train, batch_size=batch_size, verbose=1, epochs=epochs,
                   validation_data=(x_test, y_test), callbacks=callbacks)
